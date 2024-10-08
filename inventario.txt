@@ -8,4 +8,4 @@ Miel,general,12.0,44
 Jugo de Naranja,Bebidas,12.2,33
 Jabon Jonhson,Limpieza,12.0,55
 Leche de Avellana,Lacteos,12.44,15
-Peras,Fruta,44.32,12
+Mantequilla Villasol,Comida,22.3,12

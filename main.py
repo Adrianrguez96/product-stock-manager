@@ -4,42 +4,43 @@ import os  # Librería de funciones de la consola de comandos
 # Clase para los productos
 class Producto:
     def __init__(self, nombre, categoria, precio, cantidad):
-        self.nombre = nombre
-        self.categoria = categoria
-        self.precio = precio
-        self.cantidad = cantidad
+        # Atributos privados
+        self._nombre = nombre
+        self._categoria = categoria
+        self._precio = precio
+        self._cantidad = cantidad
 
     # Getters
     def get_nombre(self):
-        return self.nombre
+        return self._nombre
 
     def get_categoria(self):
-        return self.categoria
+        return self._categoria
 
     def get_precio(self):
-        return self.precio
+        return self._precio
 
     def get_cantidad(self):
-        return self.cantidad
+        return self._cantidad
 
     # Setters
     def set_nombre(self, nombre):
-        self.nombre = nombre
+        self._nombre = nombre
 
     def set_categoria(self, categoria):
-        self.categoria = categoria
+        self._categoria = categoria
 
     def set_precio(self, precio):
         if precio <= 0:
             print("| !! El precio no puede ser negativo.")
             return
-        self.precio = precio
+        self._precio = precio
 
     def set_cantidad(self, cantidad):
         if cantidad < 0:
             print("| !! La cantidad no puede ser negativa.")
             return
-        self.cantidad = cantidad
+        self._cantidad = cantidad
 
 
 # Clase para el inventario
