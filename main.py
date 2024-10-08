@@ -53,20 +53,23 @@ class Inventario:
         try:
             with open('inventario.txt', 'r') as archivo:
                 for linea in archivo:
-                    nombre, categoria, precio, cantidad = linea.strip().split(',')
-                    producto = Producto(nombre, categoria, float(precio), int(cantidad))
-                    self.productos.append(producto)  # Agregar productos a la lista
+                    try:
+                        nombre, categoria, precio, cantidad = linea.strip().split(',')
+                        producto = Producto(nombre, categoria, float(precio), int(cantidad))
+                        self.productos.append(producto)
+                    except ValueError:
+                        print(f"| !! Error en el formato de la línea: {linea.strip()}. Se ignorará.")
             print("Inventario cargado correctamente.")
         
         except FileNotFoundError:
             print("Archivo inventario.txt no encontrado. Se creará uno nuevo.")
-            open('inventario.txt', 'w').close()
-    
+            open('inventario.txt', 'w').close()  # Crear un nuevo archivo
+
     # Función para borrar la pantalla dependiendo del sistema operativo
     def borrar_pantalla(self):
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    #Función para mostrar todo el inventario de productos del sistema
+    # Función para mostrar todo el inventario de productos del sistema
     def mostrar_inventario(self):
         print("\n" + "="*100)
         print("                Inventario de Productos")
@@ -84,6 +87,56 @@ class Inventario:
         print("\nPresione Enter para volver al menú...")
         input()
         self.borrar_pantalla()
+    
+    # Función para agregar nuevos productos (En construcción)
+    def agregar_producto(self):
+        print("\n" + "="*100)
+        print("                Agregar Producto")
+        print("="*100)
+
+        print("Nombre: ")
+        nombre = input()
+        print("Categoría: ")
+        categoria = input()
+        print("Precio: ")
+        precio = float(input())
+        print("Cantidad: ")
+        cantidad = int(input())
+        
+        producto = Producto(nombre, categoria, precio, cantidad)
+        self.productos.append(producto)
+
+        print(f"|| El producto {nombre} ha sido agregado con éxito al inventario.")
+    
+    # Función para borrar un producto del inventario
+    def eliminar_producto(self):
+        self.mostrar_inventario()
+        
+        print("\n" + "="*100)
+        print("                Eliminar Producto")
+        print("="*100)
+        
+        print("Elija el nombre del producto que desea eliminar: ")
+        producto_eliminado = input().strip()  # Eliminar espacios en blanco
+        
+        # Buscar y eliminar el producto de la lista
+        for producto in self.productos:
+            if producto.get_nombre().lower() == producto_eliminado.lower():
+                
+                self.productos.remove(producto)
+                del producto
+
+                print(f"|| El producto {producto_eliminado} ha sido eliminado con éxito.")
+                return  
+            
+        print(f"|| El producto {producto_eliminado} no existe en el inventario.")
+
+    # Función para guardar el inventario en el archivo
+    def guardar_inventario_en_archivo(self):
+        with open('inventario.txt', 'w') as archivo:
+            for producto in self.productos:
+                archivo.write(f"{producto.get_nombre()},{producto.get_categoria()},{producto.get_precio()},{producto.get_cantidad()}\n")
+        print("El archivo de inventario se ha actualizado correctamente.")
 
     # Menú del programa con diferentes opciones
     def mostrar_menu(self):
@@ -126,6 +179,9 @@ class Inventario:
                     print("| !! Opción no válida, elija un número del 1 al 6.")
             else:
                 print("| !! Opción no válida, debe ser un número.")
+
+        # Guardar el inventario en el archivo al salir
+        self.guardar_inventario_en_archivo()
 
 
 # Hilo principal del programa y su carga
