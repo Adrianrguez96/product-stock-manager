@@ -71,7 +71,7 @@ Once the program is running, you will see a menu with the following options:
 - The inventory data is stored in a plain text file named `inventario.txt`. Ensure that this file remains in the same directory as the application.
 - The program handles invalid inputs gracefully, prompting the user to enter valid values when necessary.
 - If the application is closed unexpectedly, it will save the current state of the inventory upon catching the exit signal.
-- 
+
 ### Conclusion
 
 This Inventory Management System is a practical project that demonstrates basic principles of programming, including data management, user input validation, and file handling. It can be extended and modified to include more features, making it an excellent starting point for those interested in building more complex applications.
