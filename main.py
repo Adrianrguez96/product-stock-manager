@@ -1,5 +1,6 @@
 import os  # Librería de funciones de la consola de comandos
 
+
 # Clase para los productos
 class Producto:
     def __init__(self, nombre, categoria, precio, cantidad):
@@ -8,7 +9,7 @@ class Producto:
         self.precio = precio
         self.cantidad = cantidad
 
-    # Getters de la clase Producto
+    # Getters
     def get_nombre(self):
         return self.nombre
 
@@ -21,7 +22,7 @@ class Producto:
     def get_cantidad(self):
         return self.cantidad
 
-    # Setters de la clase Producto
+    # Setters
     def set_nombre(self, nombre):
         self.nombre = nombre
 
@@ -53,7 +54,7 @@ class Inventario:
             with open('inventario.txt', 'r') as archivo:
                 for linea in archivo:
                     try:
-                        nombre, categoria, precio, cantidad = linea.strip().split(',')
+                        nombre, categoria, precio, cantidad = linea.strip().rsplit(',', 3)
                         producto = Producto(nombre, categoria, float(precio), int(cantidad))
                         self.productos.append(producto)
                     except ValueError:
@@ -66,30 +67,31 @@ class Inventario:
 
     # Función para guardar el inventario en el archivo
     def guardar_inventario_en_archivo(self):
-        with open('inventario.txt', 'w') as archivo:
-            for producto in self.productos:
-                archivo.write(f"{producto.get_nombre()},{producto.get_categoria()},{producto.get_precio()},{producto.get_cantidad()}\n")
-        print("El archivo de inventario se ha actualizado correctamente.")
-    
-    # Función para borrar la pantalla dependiendo del sistema operativo
+        try:
+            with open('inventario.txt', 'w') as archivo:
+                for producto in self.productos:
+                    archivo.write(f"{producto.get_nombre()},{producto.get_categoria()},{producto.get_precio()},{producto.get_cantidad()}\n")
+                print("El archivo de inventario se ha actualizado correctamente.")
+        except Exception as e:
+            print(f"|| Error al guardar el archivo: {e}")
+
+    # Función para borrar la pantalla
     def borrar_pantalla(self):
         os.system('cls' if os.name == 'nt' else 'clear')
 
-    # Función para mostrar todo el inventario de productos del sistema
+    # Función para mostrar todo el inventario de productos
     def mostrar_inventario(self):
         print("\n" + "=" * 100)
         print("                Inventario de Productos")
         print("=" * 100)
         print(f"{'Nombre':<30} | {'Categoría':<20} | {'Precio':<10} | {'Cantidad':<10}")
         print("-" * 100)
-        
+
         for producto in self.productos:
             print(f"{producto.get_nombre():<30} | {producto.get_categoria():<20} | "
                   f"{producto.get_precio():<10.2f} | {producto.get_cantidad():<10}")
-        
+
         print("=" * 100)
-        
-        # Esperar hasta que el usuario presione Enter
         print("\nPresione Enter para volver al menú...")
         input()
         self.borrar_pantalla()
@@ -100,57 +102,87 @@ class Inventario:
         print("                Agregar Producto")
         print("=" * 100)
 
-        nombre = input("Nombre: ")
-        categoria = input("Categoría: ")
+        nombre = self.obtener_input_no_vacio("Nombre (puede incluir espacios): ")
+        categoria = self.obtener_input_no_vacio("Categoría (puede incluir espacios): ")
+        precio = self.obtener_precio_valido("Precio: ")
+        cantidad = self.obtener_cantidad_valida("Cantidad: ")
 
-        # Bucle para revisar si el precio del producto ingresado es válido
+        producto = Producto(nombre, categoria, precio, cantidad)
+        self.productos.append(producto)
+        print(f"|| El producto '{nombre}' ha sido agregado con éxito al inventario.")
+
+    # Función para eliminar un producto del inventario
+    def eliminar_producto(self):
+        self.mostrar_inventario()
+        print("\n" + "=" * 100)
+        print("                Eliminar Producto")
+        print("=" * 100)
+
+        producto_eliminado = input("Elija el nombre del producto que desea eliminar: ").strip()
+        for producto in self.productos:
+            if producto.get_nombre().lower() == producto_eliminado.lower():
+                self.productos.remove(producto)
+                print(f"|| El producto '{producto_eliminado}' ha sido eliminado con éxito.")
+                return
+        
+        print(f"|| El producto '{producto_eliminado}' no existe en el inventario.")
+
+    # Función para buscar productos en el inventario
+    def buscar_producto(self):
+        buscar_producto = input("Buscar producto: ").strip()
+        encontrados = []
+        palabras_busqueda = [palabra.lower() for palabra in buscar_producto.split()]
+
+        for producto in self.productos:
+            nombre_producto = producto.get_nombre().lower()
+            if all(palabra in nombre_producto for palabra in palabras_busqueda):
+                encontrados.append(producto)
+        
+        if encontrados:
+            print("\nEncontrados:")
+            for producto in encontrados:
+                print(f"|| {producto.get_nombre()} | {producto.get_categoria()} | {producto.get_cantidad()} | {producto.get_precio()}")
+            print("=" * 100)
+        else:
+            print(f"|| El producto '{buscar_producto}' no existe en el inventario.")
+
+        print("\nPresione Enter para volver al menú...")
+        input()
+        self.borrar_pantalla()
+
+    # Función para obtener una entrada de usuario que no puede estar vacía
+    def obtener_input_no_vacio(self, mensaje):
         while True:
-            precio = input("Precio: ")
+            entrada = input(mensaje).strip()
+            if entrada:
+                return entrada
+            print("| !! La entrada no puede estar vacía.")
+
+    # Función para obtener un precio válido
+    def obtener_precio_valido(self, mensaje):
+        while True:
+            precio = input(mensaje)
             try:
                 precio = float(precio)
                 if precio <= 0:
                     print("| !! El precio debe ser mayor que cero.")
                 else:
-                    break
+                    return precio
             except ValueError:
                 print("| !! El precio debe ser un número.")
-        
-        # Bucle para revisar si la cantidad del producto ingresada es válida
+
+    # Función para obtener una cantidad válida
+    def obtener_cantidad_valida(self, mensaje):
         while True:
-            cantidad = input("Cantidad: ")
+            cantidad = input(mensaje)
             try:
                 cantidad = int(cantidad)
                 if cantidad < 0:
                     print("| !! La cantidad no puede ser negativa.")
                 else:
-                    break
+                    return cantidad
             except ValueError:
                 print("| !! La cantidad debe ser un número.")
-        
-        # Agregamos el nuevo producto a la lista
-        producto = Producto(nombre, categoria, precio, cantidad)
-        self.productos.append(producto)
-
-        print(f"|| El producto {nombre} ha sido agregado con éxito al inventario.")
-
-    # Función para borrar un producto del inventario
-    def eliminar_producto(self):
-        self.mostrar_inventario()
-        
-        print("\n" + "=" * 100)
-        print("                Eliminar Producto")
-        print("=" * 100)
-        
-        producto_eliminado = input("Elija el nombre del producto que desea eliminar: ").strip()
-        
-        # Buscar y eliminar el producto de la lista
-        for producto in self.productos:
-            if producto.get_nombre().lower() == producto_eliminado.lower():
-                self.productos.remove(producto)
-                print(f"|| El producto {producto_eliminado} ha sido eliminado con éxito.")
-                return
-        
-        print(f"|| El producto {producto_eliminado} no existe en el inventario.")
 
     # Menú del programa con diferentes opciones
     def mostrar_menu(self):
@@ -164,12 +196,10 @@ class Inventario:
         print("5  | Mostrar inventario")
         print("6  | Salir")
         print("=" * 100)
-        print("  Elige una opción del 1 al 6: ")
-    
+
     def run(self):
         self.menu_opcion = -1
         
-        # Bucle del menú de opciones del programa
         while self.menu_opcion != 6:
             self.mostrar_menu()
             opcion = input("Elija una opción (1-6): ")
@@ -177,7 +207,6 @@ class Inventario:
 
             if opcion.isdigit():
                 self.menu_opcion = int(opcion)
-
                 if 1 <= self.menu_opcion <= 6:
                     if self.menu_opcion == 1:
                         self.agregar_producto()
@@ -186,7 +215,7 @@ class Inventario:
                     elif self.menu_opcion == 3:
                         self.buscar_producto()
                     elif self.menu_opcion == 4:
-                        self.actualizar_producto()
+                        self.actualizar_producto()  # Aquí puedes implementar la función si lo deseas
                     elif self.menu_opcion == 5:
                         self.mostrar_inventario()
                 else:
