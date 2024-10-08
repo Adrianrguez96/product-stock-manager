@@ -1,0 +1,4 @@
+Manzana,Fruta,0.5,50
+Leche,Lacteos,1.2,20
+Pan,Basicos,0.8,30
+Cereal,Desayuno,3.5,15
