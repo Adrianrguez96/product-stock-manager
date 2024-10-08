@@ -11,23 +11,23 @@ class Producto:
     # Getters de la clase Producto
     def get_nombre(self):
         return self.nombre
-    
+
     def get_categoria(self):
         return self.categoria
-    
+
     def get_precio(self):
         return self.precio
-    
+
     def get_cantidad(self):
         return self.cantidad
-    
+
     # Setters de la clase Producto
     def set_nombre(self, nombre):
         self.nombre = nombre
-    
+
     def set_categoria(self, categoria):
         self.categoria = categoria
-    
+
     def set_precio(self, precio):
         if precio <= 0:
             print("| !! El precio no puede ser negativo.")
@@ -35,7 +35,7 @@ class Producto:
         self.precio = precio
 
     def set_cantidad(self, cantidad):
-        if cantidad <= 0:
+        if cantidad < 0:
             print("| !! La cantidad no puede ser negativa.")
             return
         self.cantidad = cantidad
@@ -43,7 +43,6 @@ class Producto:
 
 # Clase para el inventario
 class Inventario:
-
     def __init__(self):
         self.productos = []  # Lista de productos
         self.cargar_productos()
@@ -65,91 +64,106 @@ class Inventario:
             print("Archivo inventario.txt no encontrado. Se creará uno nuevo.")
             open('inventario.txt', 'w').close()  # Crear un nuevo archivo
 
-    # Función para borrar la pantalla dependiendo del sistema operativo
-    def borrar_pantalla(self):
-        os.system('cls' if os.name == 'nt' else 'clear')
-
-    # Función para mostrar todo el inventario de productos del sistema
-    def mostrar_inventario(self):
-        print("\n" + "="*100)
-        print("                Inventario de Productos")
-        print("="*100)
-        print(f"{'Nombre':<30} | {'Categoría':<20} | {'Precio':<10} | {'Cantidad':<10}")
-        print("-"*100)
-        
-        for producto in self.productos:
-            print(f"{producto.get_nombre():<30} | {producto.get_categoria():<20} | "
-                  f"{producto.get_precio():<10.2f} | {producto.get_cantidad():<10}")
-            
-            print("="*100)
-        
-        # Esperar hasta que el usuario presione Enter
-        print("\nPresione Enter para volver al menú...")
-        input()
-        self.borrar_pantalla()
-    
-    # Función para agregar nuevos productos (En construcción)
-    def agregar_producto(self):
-        print("\n" + "="*100)
-        print("                Agregar Producto")
-        print("="*100)
-
-        print("Nombre: ")
-        nombre = input()
-        print("Categoría: ")
-        categoria = input()
-        print("Precio: ")
-        precio = float(input())
-        print("Cantidad: ")
-        cantidad = int(input())
-        
-        producto = Producto(nombre, categoria, precio, cantidad)
-        self.productos.append(producto)
-
-        print(f"|| El producto {nombre} ha sido agregado con éxito al inventario.")
-    
-    # Función para borrar un producto del inventario
-    def eliminar_producto(self):
-        self.mostrar_inventario()
-        
-        print("\n" + "="*100)
-        print("                Eliminar Producto")
-        print("="*100)
-        
-        print("Elija el nombre del producto que desea eliminar: ")
-        producto_eliminado = input().strip()  # Eliminar espacios en blanco
-        
-        # Buscar y eliminar el producto de la lista
-        for producto in self.productos:
-            if producto.get_nombre().lower() == producto_eliminado.lower():
-                
-                self.productos.remove(producto)
-                del producto
-
-                print(f"|| El producto {producto_eliminado} ha sido eliminado con éxito.")
-                return  
-            
-        print(f"|| El producto {producto_eliminado} no existe en el inventario.")
-
     # Función para guardar el inventario en el archivo
     def guardar_inventario_en_archivo(self):
         with open('inventario.txt', 'w') as archivo:
             for producto in self.productos:
                 archivo.write(f"{producto.get_nombre()},{producto.get_categoria()},{producto.get_precio()},{producto.get_cantidad()}\n")
         print("El archivo de inventario se ha actualizado correctamente.")
+    
+    # Función para borrar la pantalla dependiendo del sistema operativo
+    def borrar_pantalla(self):
+        os.system('cls' if os.name == 'nt' else 'clear')
+
+    # Función para mostrar todo el inventario de productos del sistema
+    def mostrar_inventario(self):
+        print("\n" + "=" * 100)
+        print("                Inventario de Productos")
+        print("=" * 100)
+        print(f"{'Nombre':<30} | {'Categoría':<20} | {'Precio':<10} | {'Cantidad':<10}")
+        print("-" * 100)
+        
+        for producto in self.productos:
+            print(f"{producto.get_nombre():<30} | {producto.get_categoria():<20} | "
+                  f"{producto.get_precio():<10.2f} | {producto.get_cantidad():<10}")
+        
+        print("=" * 100)
+        
+        # Esperar hasta que el usuario presione Enter
+        print("\nPresione Enter para volver al menú...")
+        input()
+        self.borrar_pantalla()
+
+    # Función para agregar nuevos productos
+    def agregar_producto(self):
+        print("\n" + "=" * 100)
+        print("                Agregar Producto")
+        print("=" * 100)
+
+        nombre = input("Nombre: ")
+        categoria = input("Categoría: ")
+
+        # Bucle para revisar si el precio del producto ingresado es válido
+        while True:
+            precio = input("Precio: ")
+            try:
+                precio = float(precio)
+                if precio <= 0:
+                    print("| !! El precio debe ser mayor que cero.")
+                else:
+                    break
+            except ValueError:
+                print("| !! El precio debe ser un número.")
+        
+        # Bucle para revisar si la cantidad del producto ingresada es válida
+        while True:
+            cantidad = input("Cantidad: ")
+            try:
+                cantidad = int(cantidad)
+                if cantidad < 0:
+                    print("| !! La cantidad no puede ser negativa.")
+                else:
+                    break
+            except ValueError:
+                print("| !! La cantidad debe ser un número.")
+        
+        # Agregamos el nuevo producto a la lista
+        producto = Producto(nombre, categoria, precio, cantidad)
+        self.productos.append(producto)
+
+        print(f"|| El producto {nombre} ha sido agregado con éxito al inventario.")
+
+    # Función para borrar un producto del inventario
+    def eliminar_producto(self):
+        self.mostrar_inventario()
+        
+        print("\n" + "=" * 100)
+        print("                Eliminar Producto")
+        print("=" * 100)
+        
+        producto_eliminado = input("Elija el nombre del producto que desea eliminar: ").strip()
+        
+        # Buscar y eliminar el producto de la lista
+        for producto in self.productos:
+            if producto.get_nombre().lower() == producto_eliminado.lower():
+                self.productos.remove(producto)
+                print(f"|| El producto {producto_eliminado} ha sido eliminado con éxito.")
+                return
+        
+        print(f"|| El producto {producto_eliminado} no existe en el inventario.")
 
     # Menú del programa con diferentes opciones
     def mostrar_menu(self):
-        print("\n" + "="*100)
+        print("\n" + "=" * 100)
         print("      📦  Bienvenido al Inventario de Productos  📦")
-        print("="*100)
+        print("=" * 100)
         print("1  | Agregar producto")
         print("2  | Eliminar producto")
         print("3  | Buscar producto")
         print("4  | Actualizar producto")
         print("5  | Mostrar inventario")
         print("6  | Salir")
-        print("="*100)
+        print("=" * 100)
         print("  Elige una opción del 1 al 6: ")
     
     def run(self):
