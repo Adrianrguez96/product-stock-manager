@@ -1,4 +1,4 @@
-Leche,Lacteos,1.2,20
+Leche,Lacteo,1.2,20
 Pan,Basicos,0.8,30
 Cereal,Desayuno,3.5,15
 Hamburguesa,Congelados,12.33,12
@@ -9,3 +9,4 @@ Jugo de Naranja,Bebidas,12.2,33
 Jabon Jonhson,Limpieza,12.0,55
 Leche de Avellana,Lacteos,12.44,15
 Mantequilla Villasol,Comida,22.3,12
+Yogurt,Lacteos,0.44,12
