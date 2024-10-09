@@ -4,7 +4,15 @@ import os  # Librería de funciones de la consola de comandos
 # Clase para los productos
 class Producto:
     def __init__(self, nombre, categoria, precio, cantidad):
-        # Atributos privados
+        """
+        Inicializa un nuevo producto.
+
+        :param nombre: Nombre del producto.
+        :param categoria: Categoría del producto.
+        :param precio: Precio del producto (debe ser mayor que 0).
+        :param cantidad: Cantidad del producto (debe ser mayor o igual que 0).
+        """
+
         self._nombre = nombre
         self._categoria = categoria
         self._precio = precio
@@ -12,31 +20,39 @@ class Producto:
 
     # Getters para acceder a los atributos privados
     def get_nombre(self):
+        """Retorna el nombre del producto."""
         return self._nombre
 
     def get_categoria(self):
+        """Retorna la categoria del producto."""
         return self._categoria
 
     def get_precio(self):
+        """Retorna el precio del producto."""
         return self._precio
 
     def get_cantidad(self):
+        """Retorna la cantidad del producto."""
         return self._cantidad
 
     # Setters para modificar los atributos, con validaciones
     def set_nombre(self, nombre):
+        """Establece el nombre del producto."""
         self._nombre = nombre
 
     def set_categoria(self, categoria):
+        """Establece el nombre de la categoria."""
         self._categoria = categoria
 
     def set_precio(self, precio):
+        """Establece el precio del producto, validando que sea mayor que 0."""
         if precio <= 0:
-            print("| !! El precio no puede ser negativo.")
+            print("| !! El precio no puede ser negativo o cero.")
             return
         self._precio = precio
 
     def set_cantidad(self, cantidad):
+        """Establece la cantidad del producto, validando que no sea negativa."""
         if cantidad < 0:
             print("| !! La cantidad no puede ser negativa.")
             return
@@ -45,12 +61,14 @@ class Producto:
 
 # Clase para el inventario
 class Inventario:
+
     def __init__(self):
+        """Inicializa el inventario y carga los productos desde un archivo."""
         self.productos = []  # Lista de productos
         self.cargar_productos() # Cargar productos desde el archivo al iniciar
 
-    # Función para cargar los productos al inventario desde un archivo
     def cargar_productos(self):
+        """Carga los productos desde el archivo 'inventario.txt'."""
         try:
             with open('inventario.txt', 'r') as archivo:
                 for linea in archivo:
@@ -67,8 +85,8 @@ class Inventario:
             print("Archivo inventario.txt no encontrado. Se creará uno nuevo.")
             open('inventario.txt', 'w').close()  # Crear un nuevo archivo
 
-    # Función para guardar el inventario en el archivo
     def guardar_inventario_en_archivo(self):
+        """Guarda el inventario en el archivo 'inventario.txt'."""
         try:
             with open('inventario.txt', 'w') as archivo:
                 for producto in self.productos:
@@ -78,12 +96,18 @@ class Inventario:
         except Exception as e:
             print(f"|| Error al guardar el archivo: {e}")
 
-    # Función para borrar la pantalla
     def borrar_pantalla(self):
+        """Borra la pantalla de la consola."""
         os.system('cls' if os.name == 'nt' else 'clear')
+    
+    def modo_espera(self):
+        """Pone el programa en modo espera hasta que el usuario presione Enter."""
+        print("\nPresione Enter para volver al menú...")
+        input()
+        self.borrar_pantalla()
 
-    # Función para mostrar todo el inventario de productos
     def mostrar_inventario(self):
+        """Muestra todos los productos disponibles en el inventario."""
         print("\n" + "=" * 100)
         print("                Inventario de Productos")
         print("=" * 100)
@@ -95,17 +119,21 @@ class Inventario:
                   f"{producto.get_precio():<10.2f} | {producto.get_cantidad():<10}")
 
         print("=" * 100)
-        print("\nPresione Enter para volver al menú...")
-        input()
-        self.borrar_pantalla()
 
-    # Función para agregar nuevos productos
+    
     def agregar_producto(self):
+        """Agrega un nuevo producto al inventario."""
         print("\n" + "=" * 100)
         print("                Agregar Producto")
         print("=" * 100)
 
         nombre = self.obtener_input_no_vacio("Nombre (puede incluir espacios): ")
+        for producto in self.productos:
+            if producto.get_nombre().lower() == nombre.lower():
+                print(f"|| El producto '{nombre}' ya existe en el inventario.")
+                self.modo_espera()
+                return  # Volver al menú sin agregar el producto
+
         categoria = self.obtener_input_no_vacio("Categoría (puede incluir espacios): ")
         precio = self.obtener_precio_valido("Precio: ")
         cantidad = self.obtener_cantidad_valida("Cantidad: ")
@@ -113,9 +141,11 @@ class Inventario:
         producto = Producto(nombre, categoria, precio, cantidad)
         self.productos.append(producto) # Añadir el nuevo producto a la lista
         print(f"|| El producto '{nombre}' ha sido agregado con éxito al inventario.")
+        self.modo_espera()
 
-    # Función para eliminar un producto del inventario
+    
     def eliminar_producto(self):
+        """Elimina un producto del inventario."""
         self.mostrar_inventario() # Mostrar el inventario antes de eliminar
         print("\n" + "=" * 100)
         print("                Eliminar Producto")
@@ -126,12 +156,15 @@ class Inventario:
             if producto.get_nombre().lower() == producto_eliminado.lower():
                 self.productos.remove(producto) # Eliminar el producto de la lista
                 print(f"|| El producto '{producto_eliminado}' ha sido eliminado con éxito.")
+                self.modo_espera()
                 return
         
         print(f"|| El producto '{producto_eliminado}' no existe en el inventario.")
+        self.modo_espera()
 
     # Función para buscar productos en el inventario
     def buscar_producto(self):
+        """Busca productos en el inventario por nombre."""
         buscar_producto = input("Buscar producto: ").strip()
         encontrados = []
 
@@ -153,16 +186,14 @@ class Inventario:
         else:
             print(f"|| El producto '{buscar_producto}' no existe en el inventario.")
 
-        print("\nPresione Enter para volver al menú...")
-        input()
-        self.borrar_pantalla()
+        self.modo_espera()
 
-    #Función para actualizar productos en el inventario
     def actualizar_producto(self):
+        """Actualiza los datos de un producto en el inventario."""
         print("\n" + "=" * 100)
         print("                Actualizar Producto")
         print("=" * 100)
-
+        print("En caso de no querer modificar ese dato, simplemente dejarlo en blanco saltando la casilla con Enter.")
         producto_actualizar = self.obtener_input_no_vacio("Nombre del producto a actualizar (puede incluir espacios): ").strip()
 
         for producto in self.productos:
@@ -183,7 +214,7 @@ class Inventario:
 
                 #Confirmación de la actualización del producto
                 print("=" * 100)
-                print ("\Datos del producto actualizados:")
+                print ("| Datos del producto actualizados:")
                 print(f"Nombre: {nuevo_nombre}")
                 print(f"Categoría: {nueva_categoria}")
                 print(f"Precio: {precio_nuevo}")
@@ -199,24 +230,29 @@ class Inventario:
                     producto.set_cantidad(cantidad_nueva)
 
                     print(f"|| El producto '{nuevo_nombre}' ha sido actualizado con éxito.")
+                    self.modo_espera()
+                    return
                 else:
                     print("| !! La actualización ha sido cancelada.")
-                
-                return
+                    self.modo_espera()
+                    return
         
         print(f"|| El producto '{producto_actualizar}' no existe en el inventario o no lo ha escrito correctamente.")
+        self.modo_espera()
 
 
     # Función para obtener una entrada de usuario que no puede estar vacía
     def obtener_input_no_vacio(self, mensaje):
+        """Solicita al usuario un input y verifica que no esté vacío."""
         while True:
             entrada = input(mensaje).strip()
             if entrada:
                 return entrada
             print("| !! La entrada no puede estar vacía.")
 
-    # Función para obtener un precio válido
+
     def obtener_precio_valido(self, mensaje, precio_actual=None):
+        """Solicita un precio válido al usuario."""
         while True:
             precio = input(mensaje)
             if not precio and precio_actual is not None:  # Si no se ingresa nada, usar el precio actual
@@ -224,14 +260,15 @@ class Inventario:
             try:
                 precio = float(precio)
                 if precio <= 0:
-                    print("| !! El precio debe ser mayor que cero.")
+                    print("| !! El precio no debe ser cero o menor a ese valor.")
                 else:
                     return precio
             except ValueError:
                 print("| !! El precio debe ser un número.")
             
-    # Función para obtener una cantidad válida
+
     def obtener_cantidad_valida(self, mensaje, cantidad_actual=None):
+        """Solicita una cantidad válida al usuario."""
         while True:
             cantidad = input(mensaje)
             if not cantidad and cantidad_actual is not None:  # Si no se ingresa nada, usar la cantidad actual
@@ -246,8 +283,9 @@ class Inventario:
                 print("| !! La cantidad debe ser un número.")
     
 
-    # Menú del programa con diferentes opciones
+    
     def mostrar_menu(self):
+        """Muestra el menú principal y ejecuta las opciones seleccionadas."""
         print("\n" + "=" * 100)
         print("      📦  Bienvenido al Inventario de Productos  📦")
         print("=" * 100)
@@ -260,6 +298,7 @@ class Inventario:
         print("=" * 100)
 
     def run(self):
+        """Mantiene el programa encendido en tiempo de ejecución."""
         self.menu_opcion = -1
         
         while self.menu_opcion != 6:
@@ -281,6 +320,7 @@ class Inventario:
                         self.actualizar_producto()
                     elif self.menu_opcion == 5:
                         self.mostrar_inventario()
+                        self.modo_espera()
                 else:
                     print("| !! Opción no válida, elija un número del 1 al 6.")
             else:
@@ -290,7 +330,7 @@ class Inventario:
         self.guardar_inventario_en_archivo()
 
 
-# Hilo principal del programa y su carga
+# Ejecución del programa
 if __name__ == "__main__":
     inventario = Inventario()  # Crear una instancia de la clase Inventario
     inventario.run() # Iniciar el programa
