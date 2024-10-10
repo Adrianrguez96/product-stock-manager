@@ -3,6 +3,7 @@ import os  # Librería de funciones de la consola de comandos
 # Clase para los productos
 class Producto:
     def __init__(self, nombre, categoria, precio, cantidad):
+
         """
         Representa un producto con nombre, categoría, precio y cantidad.
         
@@ -19,60 +20,80 @@ class Producto:
         self._cantidad = cantidad
     
     def __str__ (self):
-        """Retorna una representación en forma de cadena del producto, formateada en columnas."""
+
+        """
+        Retorna una representación en forma de cadena del producto, formateada en columnas.
+        """
+
         return f"{self._nombre:<30} | {self._categoria:<20} | {self._precio:<10.2f} | {self._cantidad:<10}"
 
     # Getters para acceder a los atributos privados
     def get_nombre(self):
+
         """
         Retorna el nombre del producto.
         """
+
         return self._nombre
 
     def get_categoria(self):
+
         """
         Retorna la categoria del producto.
         """
+
         return self._categoria
 
     def get_precio(self):
+
         """
         Retorna el precio del producto.
         """
+
         return self._precio
 
     def get_cantidad(self):
+
         """
         Retorna la cantidad del producto.
         """
+
         return self._cantidad
 
     # Setters para modificar los atributos, con validaciones
     def set_nombre(self, nombre):
+
         """
         Establece el nombre del producto.
         """
+
         self._nombre = nombre
 
     def set_categoria(self, categoria):
+
         """
         Establece el nombre de la categoria.
         """
+
         self._categoria = categoria
 
     def set_precio(self, precio):
+
         """
         Establece el precio del producto, validando que sea mayor que 0.
         """
+
         if precio <= 0:
             print("| !! El precio no puede ser negativo o cero.")
             return
         self._precio = precio
 
     def set_cantidad(self, cantidad):
+
         """
         Establece la cantidad del producto, validando que no sea negativa.
         """
+
         if cantidad < 0:
             print("| !! La cantidad no puede ser negativa.")
             return
@@ -81,6 +102,7 @@ class Producto:
 
 # Clase para el inventario
 class Inventario:
+
     """
     Representa un inventario de productos, permite gestionar productos mediante varias acciones.
 
@@ -89,12 +111,14 @@ class Inventario:
     """
 
     def __init__(self):
+
         """Inicializa el inventario y carga los productos desde un archivo."""
 
         self.productos = []  # Lista de productos
         self.cargar_productos() # Cargar productos desde el archivo al iniciar
 
     def cargar_productos(self):
+
         """
         Carga los productos desde el archivo 'inventario.txt'.
 
@@ -118,6 +142,7 @@ class Inventario:
             open('inventario.txt', 'w').close()  # Crear un nuevo archivo
 
     def guardar_inventario_en_archivo(self):
+
         """
         Guarda el inventario actual en el archivo 'inventario.txt'.
 
@@ -134,6 +159,7 @@ class Inventario:
             print(f"|| Error al guardar el archivo: {e}")
 
     def borrar_pantalla(self):
+
         """
         Limpia la pantalla de la consola, funciona en Windows ('cls') y Unix ('clear').
         """
@@ -141,6 +167,7 @@ class Inventario:
         os.system('cls' if os.name == 'nt' else 'clear')
     
     def modo_espera(self):
+
         """
         Detiene la ejecución del programa hasta que el usuario presione Enter.
 
@@ -152,6 +179,7 @@ class Inventario:
         self.borrar_pantalla()
 
     def mostrar_inventario(self):
+
         """
         Muestra todos los productos en el inventario, organizados en columnas.
 
@@ -170,6 +198,7 @@ class Inventario:
 
     
     def agregar_producto(self):
+
         """
         Permite al usuario agregar un nuevo producto al inventario.
 
@@ -198,6 +227,7 @@ class Inventario:
 
     
     def eliminar_producto(self):
+
         """
         Permite al usuario eliminar un producto del inventario.
 
@@ -222,6 +252,7 @@ class Inventario:
 
     # Función para buscar productos en el inventario
     def buscar_producto(self):
+
         """
         Busca un producto en el inventario por nombre.
 
@@ -229,16 +260,13 @@ class Inventario:
         """
                 
         buscar_producto = input("Buscar producto: ").strip()
-        encontrados = []
 
         # Separar las palabras de búsqueda para realizar una búsqueda más flexible
         palabras_busqueda = [palabra.lower() for palabra in buscar_producto.split()]
 
-        for producto in self.productos:
-            nombre_producto = producto.get_nombre().lower()
-            # Verificar si todas las palabras de búsqueda están en el nombre del producto
-            if all(palabra in nombre_producto for palabra in palabras_busqueda):
-                encontrados.append(producto)
+        # Se crea una lista de compresión para realizar la busqueda eficientemente
+        encontrados = [producto for producto in self.productos if all(palabra in producto.get_nombre().lower() for palabra in palabras_busqueda)]
+
         
         # Mostrar los productos encontrados o un mensaje si no se encuentran
         if encontrados:
@@ -253,6 +281,7 @@ class Inventario:
         self.modo_espera()
 
     def actualizar_producto(self):
+
         """
         Actualiza los datos de un producto existente en el inventario.
 
@@ -305,6 +334,7 @@ class Inventario:
         self.modo_espera()
     
     def obtener_valor_actualizado (self,mensaje,valor_actual):
+
         """
         Solicita al usuario un nuevo valor para un atributo y permite dejarlo en blanco para conservar el valor actual.
 
@@ -320,6 +350,7 @@ class Inventario:
         return nuevo_valor if nuevo_valor else valor_actual
 
     def obtener_input_no_vacio(self, mensaje):
+
         """
         Solicita al usuario un input y verifica que no esté vacío.
 
@@ -338,6 +369,7 @@ class Inventario:
 
 
     def obtener_input_valido(self, mensaje, tipo, valor_actual=None):
+
         """
         Solicita al usuario un valor numérico válido, y permite dejar en blanco para mantener el valor actual.
 
@@ -375,6 +407,7 @@ class Inventario:
                 print("| !! El valor debe ser un número.")
 
     def mostrar_menu(self):
+
         """
         Muestra el menú principal con las opciones disponibles para gestionar el inventario.
         """
@@ -391,6 +424,7 @@ class Inventario:
         print("=" * 100)
 
     def run(self):
+        
         """
         Mantiene el programa en ejecución, mostrando el menú y gestionando las opciones seleccionadas.
 
