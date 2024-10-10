@@ -17,6 +17,9 @@ class Producto:
         self._categoria = categoria
         self._precio = precio
         self._cantidad = cantidad
+    
+    def __str__ (self):
+        return f"{self._nombre:<30} | {self._categoria:<20} | {self._precio:<10.2f} | {self._cantidad:<10}"
 
     # Getters para acceder a los atributos privados
     def get_nombre(self):
@@ -115,8 +118,7 @@ class Inventario:
         print("-" * 100)
 
         for producto in self.productos:
-            print(f"{producto.get_nombre():<30} | {producto.get_categoria():<20} | "
-                  f"{producto.get_precio():<10.2f} | {producto.get_cantidad():<10}")
+            print(producto)
 
         print("=" * 100)
 
@@ -179,9 +181,10 @@ class Inventario:
         
         # Mostrar los productos encontrados o un mensaje si no se encuentran
         if encontrados:
-            print("\nEncontrados:")
+            print("\n || Productos encontrados:")
+            print("=" * 100)
             for producto in encontrados:
-                print(f"|| {producto.get_nombre()} | {producto.get_categoria()} | {producto.get_cantidad()} | {producto.get_precio()}")
+                print(producto)
             print("=" * 100)
         else:
             print(f"|| El producto '{buscar_producto}' no existe en el inventario.")
@@ -200,14 +203,8 @@ class Inventario:
             if producto.get_nombre().lower() == producto_actualizar.lower():
 
                 #  Pedir nuevos valores para actualizar, con opciones para dejar en blanco
-                nuevo_nombre = input(f"Nuevo nombre (actual: {producto.get_nombre()}): ").strip()
-                if not nuevo_nombre:
-                    nuevo_nombre = producto.get_nombre()
-                
-                nueva_categoria = input(f"Nueva categoría (actual: {producto.get_categoria()}): ").strip()
-                if not nueva_categoria:
-                    nueva_categoria = producto.get_categoria()
-                
+                nuevo_nombre = self.obtener_valor_actualizado("Nuevo nombre", producto.get_nombre())
+                nueva_categoria = self.obtener_valor_actualizado("Nueva categoría", producto.get_categoria())
                 precio_nuevo = self.obtener_precio_valido(f"Nuevo precio (actual: {producto.get_precio()}): ", producto.get_precio())
                 cantidad_nueva = self.obtener_cantidad_valida(f"Nueva cantidad (actual: {producto.get_cantidad()}): ", producto.get_cantidad())
                 
@@ -239,9 +236,12 @@ class Inventario:
         
         print(f"|| El producto '{producto_actualizar}' no existe en el inventario o no lo ha escrito correctamente.")
         self.modo_espera()
+    
+    def obtener_valor_actualizado (self,mensaje,valor_actual):
+        """Solicita al usuario un nuevo valor para un atributo y permite dejarlo en blanco para conservar el valor actual."""
+        nuevo_valor = input(f"{mensaje} (actual: {valor_actual}): ").strip()
+        return nuevo_valor if nuevo_valor else valor_actual
 
-
-    # Función para obtener una entrada de usuario que no puede estar vacía
     def obtener_input_no_vacio(self, mensaje):
         """Solicita al usuario un input y verifica que no esté vacío."""
         while True:
