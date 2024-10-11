@@ -421,13 +421,12 @@ class Inventario:
         
         while self.menu_opcion != 6:
             self.mostrar_menu() # Mostrar menú de opciones
-            opcion = input("Elija una opción (1-6): ")
+            opcion = self.obtener_input_valido("Elija una opción (1-6): ","int")
             self.borrar_pantalla()
 
-            if opcion.isdigit():
-                self.menu_opcion = int(opcion)
-                if 1 <= self.menu_opcion <= len(acciones):
-                    acciones[self.menu_opcion]()
+            self.menu_opcion = int(opcion)
+            if 1 <= self.menu_opcion <= len(acciones):
+                acciones[self.menu_opcion]()
 
         # Guardar el inventario en el archivo al salir
         self.guardar_inventario_en_archivo()
