@@ -1,3 +1,7 @@
+# Inventario de Productos
+# Proyecto de Python para gestión de inventario.
+# Repositorio de GitHub: https://github.com/Adrianrguez96/product-stock-manager
+
 import os  # Librería de funciones de la consola de comandos
 
 # Clase para los productos
