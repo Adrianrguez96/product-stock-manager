@@ -244,17 +244,20 @@ class Inventario:
 
         La búsqueda no es sensible a mayúsculas/minúsculas y permite buscar por palabras clave parciales.
         """
+        print("\n" + "=" * 100)
+        print("                Buscar Productos")
+        print("=" * 100)
                 
-        nombre = input("Buscar producto: ").strip().lower()
+        nombre = input("Producto que desea buscar: ").strip().lower()
+        self.borrar_pantalla()
 
         # Se crea una lista de compresión para realizar la busqueda eficientemente
         encontrados = [producto for producto in self.productos.values() if nombre in producto.get_nombre().lower()]
-
-
         
         # Mostrar los productos encontrados o un mensaje si no se encuentran
         if encontrados:
-            print("\n || Productos encontrados:")
+            print("\n" + "=" * 100)
+            print("Productos encontrados".center(100))
             print("=" * 100)
             for producto in encontrados:
                 print(producto)
