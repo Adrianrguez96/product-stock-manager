@@ -434,8 +434,10 @@ class Inventario:
             self.borrar_pantalla()
 
             self.menu_opcion = int(opcion)
-            if 1 <= self.menu_opcion <= len(acciones):
+            if self.menu_opcion in acciones:
                 acciones[self.menu_opcion]()
+            else:
+                print("| !! Opción no válida. Por favor, elija una opción entre 1 y 6.")
 
         # Guardar el inventario en el archivo al salir
         self.guardar_inventario_en_archivo()
