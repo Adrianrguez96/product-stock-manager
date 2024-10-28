@@ -415,32 +415,34 @@ class Inventario:
 
         Permite al usuario realizar acciones como agregar, eliminar, buscar, actualizar, y mostrar productos.
         """
-
-        self.menu_opcion = -1
-
-        #Definir las acciones del menu en el diccionario
-        acciones = {
-            1: self.agregar_producto,
-            2: self.eliminar_producto,
-            3: self.buscar_producto,
-            4: self.actualizar_producto,
-            5: lambda: (self.mostrar_inventario(), self.modo_espera()),
-            6: lambda: print("Saliendo del programa...")
-        }
-        
-        while self.menu_opcion != 6:
-            self.mostrar_menu() # Mostrar menú de opciones
-            opcion = self.obtener_input_valido("Elija una opción (1-6): ","int")
-            self.borrar_pantalla()
-
-            self.menu_opcion = int(opcion)
-            if self.menu_opcion in acciones:
-                acciones[self.menu_opcion]()
-            else:
-                print("| !! Opción no válida. Por favor, elija una opción entre 1 y 6.")
-
-        # Guardar el inventario en el archivo al salir
-        self.guardar_inventario_en_archivo()
+        try:
+            self.menu_opcion = -1
+            
+            #Definir las acciones del menu en el diccionario
+            acciones = {
+                1: self.agregar_producto,
+                2: self.eliminar_producto,
+                3: self.buscar_producto,
+                4: self.actualizar_producto,
+                5: lambda: (self.mostrar_inventario(), self.modo_espera()),
+                6: lambda: print("Saliendo del programa...")
+            }
+            
+            while self.menu_opcion != 6:
+                self.mostrar_menu() # Mostrar menú de opciones
+                opcion = self.obtener_input_valido("Elija una opción (1-6): ","int")
+                self.borrar_pantalla()
+                
+                self.menu_opcion = int(opcion)
+                if self.menu_opcion in acciones:
+                    acciones[self.menu_opcion]()
+                else:
+                    print("| !! Opción no válida. Por favor, elija una opción entre 1 y 6.")
+        except Exception as e:
+            print(f"| !! Error inesperado: {e}")
+        finally:
+            # Guardar el inventario en el archivo al salir
+            self.guardar_inventario_en_archivo()
 
 
 # Ejecución del programa
