@@ -121,18 +121,19 @@ class Inventario:
         try:
             with open('inventario.txt', 'r') as archivo:
                 for linea in archivo:
-                    try:
-                        # Dividir la línea en sus componentes
-                        nombre, categoria, precio, cantidad = linea.strip().rsplit(',', 3)
-                        producto = Producto(nombre, categoria, float(precio), int(cantidad))
-                        self.productos.append(producto) # Añadir producto a la lista
-                    except ValueError:
-                        print(f"| !! Error en el formato de la línea: {linea.strip()}. Se ignorará.")
+
+                    # Dividir la línea en sus componentes
+                    nombre, categoria, precio, cantidad = linea.strip().rsplit(',', 3)
+                    producto = Producto(nombre, categoria, float(precio), int(cantidad))
+                    self.productos.append(producto) # Añadir producto a la lista
+
             print("Inventario cargado correctamente.")
         
         except FileNotFoundError:
             print("Archivo inventario.txt no encontrado. Se creará uno nuevo.")
             open('inventario.txt', 'w').close()  # Crear un nuevo archivo
+        except ValueError:
+            print(f"| !! Error en el formato de la línea: {linea.strip()}. Se ignorará.")
 
     def guardar_inventario_en_archivo(self):
         """
@@ -174,6 +175,10 @@ class Inventario:
 
         La salida incluye el nombre, categoría, precio y cantidad de cada producto.
         """
+
+        if not self.productos:
+            print("\n| El inventario está vacío.")
+            return
                 
         print("\n" + "=" * 100)
         print("Inventario de Productos".center(100))
