@@ -108,7 +108,7 @@ class Inventario:
         Inicializa el inventario y carga los productos desde un archivo.
         """
 
-        self.productos = []  # Lista de productos
+        self.productos = {}  # Lista de productos
         self.cargar_productos() # Cargar productos desde el archivo al iniciar
 
     def cargar_productos(self):
@@ -124,8 +124,7 @@ class Inventario:
 
                     # Dividir la línea en sus componentes
                     nombre, categoria, precio, cantidad = linea.strip().rsplit(',', 3)
-                    producto = Producto(nombre, categoria, float(precio), int(cantidad))
-                    self.productos.append(producto) # Añadir producto a la lista
+                    self.productos[nombre] = Producto(nombre, categoria, float(precio), int(cantidad))
 
             print("Inventario cargado correctamente.")
         
@@ -144,7 +143,7 @@ class Inventario:
 
         try:
             with open('inventario.txt', 'w') as archivo:
-                for producto in self.productos:
+                for producto in self.productos.values():
                     # Guardar cada producto en una nueva línea en el formato especificado
                     archivo.write(f"{producto.get_nombre()},{producto.get_categoria()},{producto.get_precio()},{producto.get_cantidad()}\n")
                 print("El archivo de inventario se ha actualizado correctamente.")
@@ -165,8 +164,7 @@ class Inventario:
         Útil para hacer una pausa antes de regresar al menú principal.
         """
 
-        print("\nPresione Enter para volver al menú...")
-        input()
+        input("\nPresione Enter para volver al menú...")
         self.borrar_pantalla()
 
     def mostrar_inventario(self):
@@ -186,7 +184,8 @@ class Inventario:
         print(f"{'Nombre':<30} | {'Categoría':<20} | {'Precio':<10} | {'Cantidad':<10}")
         print("-" * 100)
         
-        print("\n".join(str(producto) for producto in self.productos))
+        for producto in self.productos.values():
+            print(producto)
 
         print("=" * 100)
 
@@ -203,18 +202,17 @@ class Inventario:
         print("=" * 100)
 
         nombre = self.obtener_input_no_vacio("Nombre (puede incluir espacios): ")
-        for producto in self.productos:
-            if producto.get_nombre().lower() == nombre.lower():
-                print(f"|| El producto '{nombre}' ya existe en el inventario.")
-                self.modo_espera()
-                return  # Volver al menú sin agregar el producto
+
+        if nombre in self.productos:
+            print(f"|| El producto '{nombre}' ya existe en el inventario.")
+            self.modo_espera()
+            return
 
         categoria = self.obtener_input_no_vacio("Categoría (puede incluir espacios): ")
         precio = self.obtener_input_valido("Precio: ", "float")
         cantidad = self.obtener_input_valido("Cantidad: ", "int")
 
-        producto = Producto(nombre, categoria, precio, cantidad)
-        self.productos.append(producto) # Añadir el nuevo producto a la lista
+        self.productos[nombre] = Producto(nombre, categoria, precio, cantidad) # Añadir el nuevo producto al diccionario
         print(f"|| El producto '{nombre}' ha sido agregado con éxito al inventario.")
         self.modo_espera()
 
@@ -231,15 +229,12 @@ class Inventario:
         print("                Eliminar Producto")
         print("=" * 100)
 
-        producto_eliminado = input("Elija el nombre del producto que desea eliminar: ").strip()
-        for producto in self.productos:
-            if producto.get_nombre().lower() == producto_eliminado.lower():
-                self.productos.remove(producto) # Eliminar el producto de la lista
-                print(f"|| El producto '{producto_eliminado}' ha sido eliminado con éxito.")
-                self.modo_espera()
-                return
-        
-        print(f"|| El producto '{producto_eliminado}' no existe en el inventario.")
+        nombre = input("Elija el nombre del producto que desea eliminar: ").strip()
+        if nombre in self.productos:
+            del self.productos[nombre]
+            print(f"|| El producto '{nombre}' ha sido eliminado con éxito.")
+        else:
+            print(f"|| El producto '{nombre}' no existe en el inventario.")
         self.modo_espera()
 
     # Función para buscar productos en el inventario
@@ -250,13 +245,11 @@ class Inventario:
         La búsqueda no es sensible a mayúsculas/minúsculas y permite buscar por palabras clave parciales.
         """
                 
-        buscar_producto = input("Buscar producto: ").strip()
-
-        # Separar las palabras de búsqueda para realizar una búsqueda más flexible
-        palabras_busqueda = [palabra.lower() for palabra in buscar_producto.split()]
+        nombre = input("Buscar producto: ").strip().lower()
 
         # Se crea una lista de compresión para realizar la busqueda eficientemente
-        encontrados = [producto for producto in self.productos if all(palabra in producto.get_nombre().lower() for palabra in palabras_busqueda)]
+        encontrados = [producto for producto in self.productos.values() if nombre in producto.get_nombre().lower()]
+
 
         
         # Mostrar los productos encontrados o un mensaje si no se encuentran
@@ -267,7 +260,7 @@ class Inventario:
                 print(producto)
             print("=" * 100)
         else:
-            print(f"|| El producto '{buscar_producto}' no existe en el inventario.")
+            print(f"|| El producto '{nombre}' no existe en el inventario.")
 
         self.modo_espera()
 
@@ -285,43 +278,47 @@ class Inventario:
         print("En caso de no querer modificar ese dato, simplemente dejarlo en blanco saltando la casilla con Enter.")
         producto_actualizar = self.obtener_input_no_vacio("Nombre del producto a actualizar (puede incluir espacios): ").strip()
 
-        for producto in self.productos:
-            if producto.get_nombre().lower() == producto_actualizar.lower():
+        if producto_actualizar not in self.productos:
+            print(f"|| El producto '{producto_actualizar}' no existe en el inventario.")
+            self.modo_espera()
+            return
+        
+        producto = self.productos[producto_actualizar] 
 
-                #  Pedir nuevos valores para actualizar, con opciones para dejar en blanco
-                nuevo_nombre = self.obtener_valor_actualizado("Nuevo nombre", producto.get_nombre())
-                nueva_categoria = self.obtener_valor_actualizado("Nueva categoría", producto.get_categoria())
-                precio_nuevo = self.obtener_input_valido(f"Nuevo precio (actual: {producto.get_precio()}): ", "float", producto.get_precio())
-                cantidad_nueva = self.obtener_input_valido(f"Nueva cantidad (actual: {producto.get_cantidad()}): ", "int", producto.get_cantidad())
+        #  Pedir nuevos valores para actualizar, con opciones para dejar en blanco
+        nuevo_nombre = self.obtener_valor_actualizado("Nuevo nombre", producto.get_nombre())
+        nueva_categoria = self.obtener_valor_actualizado("Nueva categoría", producto.get_categoria())
+        precio_nuevo = self.obtener_input_valido(f"Nuevo precio (actual: {producto.get_precio()}): ", "float", producto.get_precio())
+        cantidad_nueva = self.obtener_input_valido(f"Nueva cantidad (actual: {producto.get_cantidad()}): ", "int", producto.get_cantidad())
                 
 
-                #Confirmación de la actualización del producto
-                print("=" * 100)
-                print ("| Datos del producto actualizados:")
-                print(f"Nombre: {nuevo_nombre}")
-                print(f"Categoría: {nueva_categoria}")
-                print(f"Precio: {precio_nuevo}")
-                print(f"Cantidad: {cantidad_nueva}")
-                print("=" * 100)
-                confirmar = input("¿Desea actualizar este producto? (s/n): ").strip().lower()
+        #Confirmación de la actualización del producto
+        print("=" * 100)
+        print ("| Datos del producto actualizados:")
+        print(f"Nombre: {nuevo_nombre}")
+        print(f"Categoría: {nueva_categoria}")
+        print(f"Precio: {precio_nuevo}")
+        print(f"Cantidad: {cantidad_nueva}")
+        print("=" * 100)
+        confirmar = input("¿Desea actualizar este producto? (s/n): ").strip().lower()
 
-                if confirmar == "s":
-                    # Aplicar los nuevos valores al producto
-                    producto.set_nombre(nuevo_nombre)
-                    producto.set_categoria(nueva_categoria)
-                    producto.set_precio(precio_nuevo)
-                    producto.set_cantidad(cantidad_nueva)
+        if confirmar == "s":
+            # Aplicar los nuevos valores al producto
+            producto.set_nombre(nuevo_nombre)
+            producto.set_categoria(nueva_categoria)
+            producto.set_precio(precio_nuevo)
+            producto.set_cantidad(cantidad_nueva)
 
-                    print(f"|| El producto '{nuevo_nombre}' ha sido actualizado con éxito.")
-                    self.modo_espera()
-                    return
-                else:
-                    print("| !! La actualización ha sido cancelada.")
-                    self.modo_espera()
-                    return
+            self.productos[nuevo_nombre] = self.productos.pop(producto_actualizar) if nuevo_nombre != producto_actualizar else producto #modificar el producto
+
+            print(f"|| El producto '{nuevo_nombre}' ha sido actualizado con éxito.")
+            self.modo_espera()
+            return
+        else:
+            print("| !! La actualización ha sido cancelada.")
+            self.modo_espera()
+            return
         
-        print(f"|| El producto '{producto_actualizar}' no existe en el inventario o no lo ha escrito correctamente.")
-        self.modo_espera()
     
     def obtener_valor_actualizado (self,mensaje,valor_actual):
         """
