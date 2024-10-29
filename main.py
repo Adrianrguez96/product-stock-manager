@@ -147,7 +147,7 @@ class Inventario:
                     # Guardar cada producto en una nueva línea en el formato especificado
                     archivo.write(f"{producto.get_nombre()},{producto.get_categoria()},{producto.get_precio()},{producto.get_cantidad()}\n")
                 print("El archivo de inventario se ha actualizado correctamente.")
-        except Exception as e:
+        except (IOError, OSError) as e:
             print(f"|| Error al guardar el archivo: {e}")
 
     def borrar_pantalla(self):
@@ -231,8 +231,12 @@ class Inventario:
 
         nombre = input("Elija el nombre del producto que desea eliminar: ").strip()
         if nombre in self.productos:
-            del self.productos[nombre]
-            print(f"|| El producto '{nombre}' ha sido eliminado con éxito.")
+            confirmar = input(f"¿Está seguro de que desea eliminar el producto '{nombre}'? (s/n): ").strip().lower()
+            if confirmar == "s":
+                del self.productos[nombre]
+                print(f"|| El producto '{nombre}' ha sido eliminado con éxito.")
+            else:
+                print(f"Eliminación de '{nombre}' cancelada.")
         else:
             print(f"|| El producto '{nombre}' no existe en el inventario.")
         self.modo_espera()
@@ -393,7 +397,7 @@ class Inventario:
             except ValueError:
                 print("| !! El valor debe ser un número.")
 
-    def mostrar_menu(self):
+    def mostrar_menu(self,acciones):
         """
         Muestra el menú principal con las opciones disponibles para gestionar el inventario.
         """
@@ -416,7 +420,7 @@ class Inventario:
         Permite al usuario realizar acciones como agregar, eliminar, buscar, actualizar, y mostrar productos.
         """
         try:
-            self.menu_opcion = -1
+            menu_opcion = -1
             
             #Definir las acciones del menu en el diccionario
             acciones = {
@@ -428,14 +432,13 @@ class Inventario:
                 6: lambda: print("Saliendo del programa...")
             }
             
-            while self.menu_opcion != 6:
-                self.mostrar_menu() # Mostrar menú de opciones
-                opcion = self.obtener_input_valido("Elija una opción (1-6): ","int")
+            while menu_opcion != 6:
+                self.mostrar_menu(acciones) # Mostrar menú de opciones
+                menu_opcion = self.obtener_input_valido("Elija una opción (1-6): ","int")
                 self.borrar_pantalla()
                 
-                self.menu_opcion = int(opcion)
-                if self.menu_opcion in acciones:
-                    acciones[self.menu_opcion]()
+                if menu_opcion in acciones:
+                    acciones[menu_opcion]()
                 else:
                     print("| !! Opción no válida. Por favor, elija una opción entre 1 y 6.")
         except Exception as e:
